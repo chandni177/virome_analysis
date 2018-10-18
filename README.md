@@ -16,5 +16,5 @@ Step 6: Host-removal
 Step 7: QC contaminant removed sequences
 Step 8: Read 1 repair
 
-![alt text](virome_analysis/sequence_decontamination.pdf)
+![alt text](virome_analysis/sequence_decontamination.png)
 
