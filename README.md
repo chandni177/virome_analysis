@@ -14,7 +14,8 @@ Scripts and Workflows Useful for Virome Analysis
 * Step 5: PhiX Removal
 * Step 6: Host-removal
 * Step 7: QC contaminant removed sequences
-* Step 8: Read 1 repair
+* Step 8: Read merge
+* Step 9: Read 1 repair
 
 ![alt text](https://github.com/shandley/virome_analysis/blob/master/sequence_decontamination.png)
 
