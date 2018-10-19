@@ -10,7 +10,8 @@
 # Step 5: PhiX Removal
 # Step 6: Host-removal
 # Step 7: QC contaminant removed sequences
-# Step 8: Read 1 repair
+# Step 8: Read merge
+# Step 9: Read repair
 
 # Set Variables
 CONPATH=/mnt/data1/databases/contaminants
@@ -59,23 +60,29 @@ bbduk.sh in="$F"_R1.s4.out.fastq in2="$F"_R2.s4.out.fastq \
 
 # Step 6: Host-removal
 bbmap.sh in="$F"_R1.s5.out.fastq in2="$F"_R2.s5.out.fastq \
-	out="$F"_R1.s6.out.fastq outm="$F"_hostmapped.s6.out.fastq \
+	out="$F"_unmapped.s6.out.fastq outm="$F"_hostmapped.s6.out.fastq \
 	minid=0.95 maxindel=3 bwr=0.16 bw=12 minhits=2\
 	quickmatch fast \
 	path=$HOSTPATH ow=t;
 
 # Step 7: QC contaminant removed sequences
-bbduk.sh in="$F"_R1.s6.out.fastq \
+bbduk.sh in="$F"_unmapped.s6.out.fastq \
 	out="$F"_R1.s7.out.fastq out2="$F"_R2.s7.out.fastq outs="$F"_singletons.s7.out.fastq \
 	qtrim=r trimq=30 \
 	maxns=2 minlength=50 \
 	ow=t;
 
-# Step 8: Read 1 repair
+# Step 8: Merge read pairs
+bbmerge.sh in1="$F"_R1.s7.out.fastq in2="$F"_R2.s7.out.fastq \
+	out="$F"_merged.fastq outu1="$F"_R1.unmerged.fastq outu2="$F"_R2.unmerged.fastq \
+	rem k=62 extend2=50 ecct vstrict=t \
+	-Xmx128g \
+	ow=t;
+
+# Step 9: Read repair
 	grep -A 3 '1:N:' "$F"_singletons.s7.out.fastq | sed '/^--$/d' > "$F"_singletons_R1.out.fastq;
 	grep -A	3 '2:N:' "$F"_singletons.s7.out.fastq | sed '/^--$/d' > "$F"_singletons_R2.out.fastq;
 
-	cat "$F"_singletons_R1.out.fastq "$F"_R1.s7.out.fastq > "$F"_R1.s8.out.fastq;
-	cat "$F"_singletons_R2.out.fastq "$F"_R2.s7.out.fastq >	"$F"_R2.s8.out.fastq;
+	cat "$F"_merged.fastq "$F"_R1.unmerged.fastq "$F"_singletons_R1.out.fastq > "$F"_R1.s8.out.fastq;
+	cat "$F"_merged.fastq "$F"_R2.unmerged.fastq "$F"_singletons_R2.out.fastq > "$F"_R2.s8.out.fastq;
 done
-
